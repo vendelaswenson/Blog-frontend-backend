@@ -41,5 +41,6 @@ deleteBtns.forEach((btn) => {
             method: 'DELETE'
           });
           showAllArt();
-      });
     });
+    
+});
