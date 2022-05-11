@@ -1,6 +1,20 @@
 'use strict'
 
 const postsList = document.getElementById('posts');
+const formTitle = document.getElementById('title');
+const formContent = document.getElementById('content');
+const formTags = document.getElementById('tags');
+const postForm = document.getElementById('createpost');
+
+let editPostItem = null;
+let entries = [];
+
+const FORM_MODES = {
+    CREATE: 'create',
+    EDIT: 'edit'
+  }
+
+  let formMode = FORM_MODES.CREATE;
 
 const tagsTemplate = (tags) => tags.map((tag) => `
   <li>${tag}</li>
@@ -21,26 +35,65 @@ const postTemplate = (data) => `
 
 const showAllArt = async () => {
     const response = await fetch('/api/articles');
-    const data = await response.json();
+    entries = await response.json();
 
-    postsList.innerHTML = data.map(postTemplate).join('');
+    postsList.innerHTML = entries.map(postTemplate).join('');
 
-}
-
-showAllArt();
-
-const deleteBtns = document.querySelectorAll('[data-function="delete"]');
-const editBtns = document.querySelectorAll('[data-function="edit"]');
-
-console.log(deleteBtns);
+    const deleteBtns = document.querySelectorAll("[data-function='delete']");
+    const editBtns = document.querySelectorAll('[data-function="edit"]');
 
 deleteBtns.forEach((btn) => {
-    btn.addEventListener("click", async () => {
-        console.log('hoho');
-        await fetch(`/api/erase`, {
+    btn.addEventListener("click", async (e) => {
+        await fetch(`/api/articles/erase/${e.target.dataset.postid}`, {
             method: 'DELETE'
           });
           showAllArt();
     });
-    
 });
+
+editBtns.forEach((btn2) => {
+    btn2.addEventListener("click", async (e) => {
+        formMode = FORM_MODES.EDIT;
+        editPostItem = entries.find(({ _id }) => _id === e.target.dataset.postid);
+        
+        formTitle.value = editPostItem.title;
+        formContent.value = editPostItem.content;
+        formTags.value = editPostItem.tags.join(',');
+    });
+});
+}
+
+
+
+postForm.addEventListener('reset', async (e) => {
+    formMode = FORM_MODES.CREATE;
+    editPostItem = null;
+  });
+
+  postForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const useUrl = formMode === FORM_MODES.CREATE ? '/api/articles/new' : `/api/articles/update/${editPostItem._id}`;
+    const method = formMode === FORM_MODES.CREATE ? 'POST' : 'PUT';
+    const date = formMode === FORM_MODES.CREATE ? new Date() : new Date(editPostItem.date);
+  
+    await fetch(useUrl, {
+      method,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        title: formTitle.value,
+        content: formContent.value,
+        date,
+        tags: formTags.value.split(',')
+      })
+    });
+    
+    postForm.reset();
+    showAllArt();
+  });
+
+
+
+showAllArt();

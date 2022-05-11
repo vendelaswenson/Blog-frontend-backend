@@ -5,10 +5,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title>Blogg</title>
 </head>
 <body>
-<h1>hoho</h1>
+<h1>Kupongkalles blogg</h1>
+<form id="createpost">
+  <h2>Skapa nytt inlägg</h2>
+  <label for="title">Titel</label>
+  <input type="text" id="title" name="title">
+  <br>
+  <label for="content">Innehåll</label>
+  <input type="text" id="content" name="content">
+  <br>
+  <label for="tags">Taggar</label>
+  <input type="text" id="tags" name="tags">
+  <br>
+  <button>Spara</button>
+  <button type="reset">Avbryt</button>
+</form>
+<h2>Inlägg:</h2>
 <ul id="posts"></ul>
     <script src="main.js"></script>
 </body>
